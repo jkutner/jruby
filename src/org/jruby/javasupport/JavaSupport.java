@@ -148,8 +148,30 @@ public class JavaSupport {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public Class loadJavaClass(String className) throws ClassNotFoundException {
+        try {
+            return loadJavaClassStrict(className);
+        } catch (ClassNotFoundException cnfExcptn) {
+            // before giving up, try replacing the last '.' with a '$' -- but only if the char following the '.'
+            // is capitalized.
+            int i = className.lastIndexOf('.');
+            if (i < className.length() && i > 0) {
+                String classNameOnly = className.substring(i+1);
+                if (Character.isUpperCase(classNameOnly.charAt(0))) {
+                    StringBuilder sb = new StringBuilder(className.substring(0, i));
+                    sb.append('$').append(classNameOnly);
+
+                    // this could make the error message a little confusing. may catch the ex here and rethrow the
+                    // original cnfExcptn?
+                    return loadJavaClassStrict(sb.toString());
+                }
+            }
+            throw cnfExcptn;
+        }
+    }
+    
+    public Class loadJavaClassStrict(String className) throws ClassNotFoundException {
         Class primitiveClass;
         if ((primitiveClass = PRIMITIVE_CLASSES.get(className)) == null) {
             if (!Ruby.isSecurityRestricted()) {

@@ -835,4 +835,15 @@ CLASSDEF
       end
     end
   end
+
+  # JRUBY-6092
+  def test_float_always_coerces_to_java_float
+    assert_nothing_raised do
+        java_import 'java.awt.Component$BaselineResizeBehavior'
+    end
+
+    assert_nothing_raised do
+        java_import 'java.awt.Component.BaselineResizeBehavior'
+    end
+  end
 end
