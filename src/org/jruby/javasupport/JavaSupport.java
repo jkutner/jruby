@@ -162,9 +162,12 @@ public class JavaSupport {
                     StringBuilder sb = new StringBuilder(className.substring(0, i));
                     sb.append('$').append(classNameOnly);
 
-                    // this could make the error message a little confusing. may catch the ex here and rethrow the
-                    // original cnfExcptn?
-                    return loadJavaClassStrict(sb.toString());
+                    try {
+                      return loadJavaClassStrict(sb.toString());
+                    } catch (ClassNotFoundException newCnfExcptn) {
+                      // the newCnfExcptn isn't going to make sense.
+                      throw cnfExcptn;
+                    }
                 }
             }
             throw cnfExcptn;
